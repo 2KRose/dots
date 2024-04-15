@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+read -r RICETHEME < "$HOME"/.config/bspwm/.tema
+export RICETHEME
+PATH="$HOME/.config/bspwm/scripts:$PATH"
+rice_dir="$HOME/.config/bspwm/temas/$RICETHEME"
+
+bspc monitor -d I II III IV V VI VII VIII IX X
+
+bspc config external_rules_command "$HOME"/.config/bspwm/scripts/ExternalRules
+
+gap=3
+
+bspc config window_gap $gap
+bspc config top_padding $(($PANEL_HEIGHT-gap))
+bspc config left_padding -$gap
+bspc config right_padding -$gap
+bspc config bottom_padding -$gap
+bspc config focus_follows_pointer true
+bspc config split_ratio          0.52
+bspc config borderless_monocle   true
+bspc config gapless_monocle      true
+bspc config focused_border_color    "#FFFFFF"
+bspc config normal_border_color
+
+# Set system vars for polybar
+. SetSysVars
+
+# Terminate already running polybar, stalonetray, sxhkd and dunst instances
+processes=("sxhkd" "polybar" "stalonetray" "dunst" "eww.*bar")
+
+	for process in "${processes[@]}"; do
+		if pgrep -f "$process"; then
+			pkill -9 -f "$process" > /dev/null; sleep 0.1
+		fi
+	done
+# polybar
+/home/kk/.config/polybar/forest/launch.sh &
+
+# Reload sxhkd daemon
+sxhkd -c "$HOME"/.config/bspwm/sxhkdrc &
+
+# Launch stalonetray
+[[ "$RICETHEME" != "z0mbi3" ]] && stalonetray -c "$HOME"/.config/bspwm/stalonetrayrc & sleep 0.1 && xdo hide -N stalonetray && touch "/tmp/syshide.lock"
+
+# Launch dunst notification daemon
+dunst -config "$HOME"/.config/bspwm/dunstrc &
+
+# Launch eww daemon
+pidof -q eww || { eww -c "$HOME"/.config/bspwm/eww daemon & }
+
+# Launch polkit
+pidof -q polkit-gnome-authentication-agent-1 || { /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 & }
+
+# Fix cursor
+xsetroot -cursor_name left_ptr
+
+# Launch picom // If you have old hardware or encounter problems
+# uncomment the picom "--legacy-backends" line and comment the current one.
+picom &
+
+#conky
+conky &
+
+#HD
+udiskie &
+
+# teclado
+setxkbmap -model abnt2 -layout br

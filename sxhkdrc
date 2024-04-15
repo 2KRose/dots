@@ -1,0 +1,107 @@
+#
+# wm independent hotkeys
+#
+
+#Print
+control + alt + z
+    flameshot gui
+
+#close all eww
+super + Escape
+    $HOME/.config/bspwm/eww-launcher/target/release/eww -c "$HOME/.config/bspwm/eww" close-all
+
+# terminal emulator
+super + Return
+	alacritty
+
+# program launcher
+super + d
+	/home/kk/.config/rofi/launchers/type-4/launcher.sh
+
+#nitrogen
+super + shift + w
+        nitrogen
+
+#wallpaper
+super + w
+        /home/kk/.config/bspwm/scripts/WallSelect
+
+#polybar
+super + b
+        /home/kk/.config/bspwm/scripts/autohide
+
+#polybar
+super + c
+        /home/kk/.config/bspwm/scripts/conky.sh
+
+#nemo
+super + e
+        nemo
+
+#pavucontrol
+super + q
+        pavucontrol
+
+#arandr
+super + p
+        arandr
+
+# make sxhkd reload its configuration files:
+super + alt + Escape
+	pkill -USR1 -x sxhkd
+
+#
+# bspwm hotkeys
+#
+
+# quit/restart bspwm
+super + alt + {q,r}
+	bspc {quit,wm -r}
+
+# close and kill
+alt + F4
+	bspc node -{c,k}
+
+
+# set the window state
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+#
+# focus/swap
+#
+
+# expand/contract a window
+super + control + {Left,Down,Up,Right}
+  bspc node -z {left -20 0 || bspc node -z right -20 0, \
+                bottom 0 20 || bspc node -z top 0 20,\
+                top 0 -20 || bspc node -z bottom 0 -20,\
+                right 20 0 || bspc node -z left 20 0}
+
+# focus the node in the given direction
+super + {_,shift + }{Left,Down,Up,Right}
+	bspc node -{f,s} {west,south,north,east}
+
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+# rotate
+super + shift + {d,a}
+    bspc node @/ -C {forward,backward}
+
+# jgmenu
+~button3
+    xqp 0 $(xdo id -N Bspwm -n root) && jgmenu --csv-file=/home/kk/.config/jgmenu/menu.csv --at-pointer
+
+# Volume control
+XF86Audio{RaiseVolume,LowerVolume,Mute}
+	Volume{ --inc, --dec, --toggle}
+
+# Music Control
+XF86Audio{Next,Prev,Play,Stop}
+	MediaControl {--next,--previous,--toggle,--stop}
